@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamer IQ Aptitude</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffcccb, #ffe0b2);
+            color: #d45d79;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        h1, h2, p {
+            margin: 20px;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+        }
+        #timer {
+            width: 50%;
+            background-color: #ddd;
+            border-radius: 20px;
+            height: 25px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        #timeLeft {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 20px;
+            width: 100%;
+            position: absolute;
+            left: 0; 
+            transition: width 1s linear, background-color 0.5s;
+        }
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            background-color: #ff6b8a;
+            color: white;
+            cursor: pointer;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .riddle {
+            font-size: 1.5em;
+        }
+        #correctAnswerDisplay {
+            margin-top: 20px; 
+        }
+    </style>
+</head>
+<body>
+    <div id="introduction" class="container">
+        <h1>Gamer IQ Aptitude</h1>
+        <p>🤔 Are You Intelligent Enough to Be Number One? 🏆</p>
+        <button onclick="showRules()">Continue</button>
+    </div>
+
+    <div id="rules" class="container hidden">
+        <h2>Rules</h2>
+        <p>💡 Correct answers earn you points!</p>
+        <p>⏳ You have only 10 seconds for all questions.</p>
+        <p>💪 Only the smartest will make it through!</p>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="game" class="container hidden">
+        <h2>Let's Go!</h2>
+        <div id="timer">
+            <div id="timeLeft"></div>
+        </div>
+        <p id="timerText">10 seconds remaining</p>
+        <div id="riddleContainer" class="riddle"></div>
+        
+        <div id="correctAnswerDisplay" class="hidden">
+            <h2>Correct Answer:</h2>
+            <p id="correctAnswerText"></p>
+            <!-- Next button added here -->
+            <button onclick="updateQuestion()">Next Question</button> 
+        </div>
+    </div>
+
+    <div id="endScreen" class="container hidden">
+        <h2>Game Over!</h2>
+        <p id="finalScoreText"></p>
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+
+    <script>
+        const riddles = [
+          { question: "I speak without a mouth and hear without ears. What am I?", answer: "An echo", section: "Riddles" },
+          { question: "I am not alive, but I can grow. I don’t have lungs, but I need air. What am I?", answer: "Fire", section: "Riddles" },
+          { question: "The more you take, the more you leave behind. What am I?", answer: "Footsteps", section: "Riddles" },
+          { question: "What has keys but open no locks? What am I?", answer: "A keyboard", section: "Riddles" },
+          { question: "What has many teeth, but can’t bite?", answer: "A comb", section: "Riddles" },
+          { question: "What has a head, a tail, but no body?", answer: "A coin", section: "Riddles" },
+          { question: "What can travel around the world while staying in a corner?", answer: "A stamp", section: "Riddles" },
+          { question:"What begins with T, ends with T, and has T in it?", answer:"Teapot", section:"Riddles"},
+          { question:"What is so fragile that saying its name breaks it?", answer:"Silence", section:"Riddles"},
+          { question:"You can hold me in your hand yet I can fill a room. What am I?", answer:"Light", section:"Riddles"}
+        ];
+
+        let currentQuestionIndex = -1;
+
+        function showRules() {
+          document.getElementById('introduction').classList.add('hidden');
+          document.getElementById('rules').classList.remove('hidden');
+      }
+
+      function startGame() {
+          currentQuestionIndex = 0; 
+          document.getElementById('rules').classList.add('hidden');
+          document.getElementById('game').classList.remove('hidden');
+          updateQuestion();
+      }
+
+      function startTimer(duration) {
+          let timeLeft = duration; 
+          document.getElementById('timerText').innerText = `${timeLeft} seconds remaining`;
+          const timeLeftElement = document.getElementById('timeLeft');
+          timeLeftElement.style.width = '100%';
+
+          const countdown = setInterval(() => {
+              if (timeLeft <= 0) {
+                  clearInterval(countdown);
+                  showCorrectAnswer();
+              } else {
+                  timeLeft--;
+                  document.getElementById('timerText').innerText = `${timeLeft} seconds remaining`;
+                  timeLeftElement.style.width = `${(timeLeft / duration) * 100}%`;
+              }
+          }, 1000);
+      }
+
+      function updateQuestion() {
+          // Check if there are more questions available
+          if (currentQuestionIndex >= riddles.length - 1) {
+              endGame();
+              return; // Exit if there are no more questions
+          }
+
+          // Increment currentQuestionIndex before updating the question
+          currentQuestionIndex++;
+          
+          const currentQuestion = riddles[currentQuestionIndex];
+          document.getElementById('riddleContainer').innerText = currentQuestion.question;
+
+          const duration = 10; // Set duration to 10 seconds for all questions
+          startTimer(duration);
+          document.getElementById('correctAnswerDisplay').classList.add('hidden'); // Hide correct answer display
+      }
+
+      function showCorrectAnswer() {
+          const correctAnswer = riddles[currentQuestionIndex].answer; 
+          document.getElementById('correctAnswerText').innerText = correctAnswer; 
+          document.getElementById('correctAnswerDisplay').classList.remove('hidden'); 
+      }
+
+      function endGame() {
+          document.getElementById('game').classList.add('hidden'); 
+          document.getElementById('endScreen').classList.remove('hidden'); 
+      }
+
+      function restartGame() {
+           document.getElementById('endScreen').classList.add('hidden'); 
+           showRules(); 
+      }
+    </script>
+</body>
+</html>
